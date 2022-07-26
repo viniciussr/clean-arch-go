@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"clean-architecture/entity"
 	"clean-architecture/usecase"
 
 	"github.com/gin-gonic/gin"
@@ -27,22 +28,20 @@ func (u UserController) GetOneUser(c *gin.Context) {
 
 	id, err := strconv.ParseInt(paramID, 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err,
-		})
+		c.JSON(http.StatusBadRequest, err)
 		return
 	}
 	user, err := u.service.GetUser(id)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-		})
+		c.JSON(http.StatusBadRequest, err)
 		return
 	}
 
-	c.JSON(200, gin.H{
-		"data": user,
-	})
+	c.JSON(http.StatusOK, userResponse{user})
 
+}
+
+type userResponse struct {
+	User *entity.User `json:"user"`
 }
